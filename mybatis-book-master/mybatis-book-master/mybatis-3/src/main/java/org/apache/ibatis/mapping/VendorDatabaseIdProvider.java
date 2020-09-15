@@ -65,6 +65,7 @@ public class VendorDatabaseIdProvider implements DatabaseIdProvider {
     String productName = getDatabaseProductName(dataSource);
     if (this.properties != null) {
       for (Map.Entry<Object, Object> property : properties.entrySet()) {
+//        只要productName中包含了property名称，就算匹配
         if (productName.contains((String) property.getKey())) {
           return (String) property.getValue();
         }

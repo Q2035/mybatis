@@ -32,6 +32,9 @@ import org.apache.ibatis.reflection.ReflectionException;
 
 /**
  * 实例化目标类
+ * MyBatis每次创建结果对象的新实例时，都会使用工厂方法（ObjectFactory）实例来完成，
+ * 默认的对象工厂DefaultObjectFactory做的仅仅是实例化目标类，要么通过默认构造方法，
+ * 要么在参数映射存在的时候通过参数构造方法来实例化。
  * @author Clinton Begin
  */
 public class DefaultObjectFactory implements ObjectFactory, Serializable {

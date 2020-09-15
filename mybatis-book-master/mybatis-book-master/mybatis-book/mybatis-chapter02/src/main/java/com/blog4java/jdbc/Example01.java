@@ -2,6 +2,7 @@ package com.blog4java.jdbc;
 
 import com.blog4java.common.DbUtils;
 import com.blog4java.common.IOUtils;
+import com.mysql.cj.jdbc.Driver;
 import org.junit.Test;
 
 import java.sql.*;

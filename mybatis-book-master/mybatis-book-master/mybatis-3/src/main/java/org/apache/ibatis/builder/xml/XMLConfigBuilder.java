@@ -124,9 +124,17 @@ public class XMLConfigBuilder extends BaseBuilder {
       reflectorFactoryElement(root.evalNode("reflectorFactory"));
       settingsElement(settings);
       // read it after objectFactory and objectWrapperFactory issue #631
+//      环境可以算时mybatis-config配置文件中最重要的部分，类似于Spring和Maven中的profile
+//      允许给开发、生产环境同时配置不同的environment
+//      MyBatis内置提供JDBC和MANAGED两种事务管理方式，前者主要用于简单的JDBC模式，后者主要用于容器管理事务
+//      一般使用JDBC事务管理方式
       environmentsElement(root.evalNode("environments"));
+//      从数据库厂商标识加载databaseIdProviderElement
       databaseIdProviderElement(root.evalNode("databaseIdProvider"));
+//      加载类型处理器
       typeHandlerElement(root.evalNode("typeHandlers"));
+//      加载mapper文件
+//      mapper文件是MyBatis框架的核心之处
       mapperElement(root.evalNode("mappers"));
     } catch (Exception e) {
       throw new BuilderException("Error parsing SQL Mapper Configuration. Cause: " + e, e);
@@ -300,6 +308,11 @@ public class XMLConfigBuilder extends BaseBuilder {
     configuration.setConfigurationFactory(resolveClass(props.getProperty("configurationFactory")));
   }
 
+  /**
+   * 加载环境配置
+   * @param context
+   * @throws Exception
+   */
   private void environmentsElement(XNode context) throws Exception {
     if (context != null) {
       if (environment == null) {
@@ -307,8 +320,11 @@ public class XMLConfigBuilder extends BaseBuilder {
       }
       for (XNode child : context.getChildren()) {
         String id = child.getStringAttribute("id");
+//        查找匹配的environment
         if (isSpecifiedEnvironment(id)) {
+//          事务配置并创建事务工厂
           TransactionFactory txFactory = transactionManagerElement(child.evalNode("transactionManager"));
+//          数据源配置加载并实例化数据源，数据源是必备的
           DataSourceFactory dsFactory = dataSourceElement(child.evalNode("dataSource"));
           DataSource dataSource = dsFactory.getDataSource();
           Environment.Builder environmentBuilder = new Environment.Builder(id)
@@ -361,6 +377,12 @@ public class XMLConfigBuilder extends BaseBuilder {
     throw new BuilderException("Environment declaration requires a DataSourceFactory.");
   }
 
+  /**
+   * Mybatis在预查询（PreparedStatement）中设置一个参数时，还是从结果集中取出一个值时，都会用类型处理器
+   * 将获取的值以合适的方式转换成Java类型
+   * @param parent
+   * @throws Exception
+   */
   private void typeHandlerElement(XNode parent) throws Exception {
     if (parent != null) {
       for (XNode child : parent.getChildren()) {
@@ -392,6 +414,12 @@ public class XMLConfigBuilder extends BaseBuilder {
     if (parent != null) {
       for (XNode child : parent.getChildren()) {
         // 通过<package>标签指定包名
+        // 如果要同时使用package自动扫描和通过mapper明确指定要加载的mapper，
+        // 一定要确保package自动扫描的范围不包含明确指定的mapper，否则在通过package扫描的interface的时候，
+        // 尝试加载对应xml文件的loadXmlResource()的逻辑中出现判重出错，
+        // 报org.apache.ibatis.binding.BindingException异常，
+        // 即使xml文件中包含的内容和mapper接口中包含的语句不重复也会出错，
+        // 包括加载mapper接口时自动加载的xml mapper也一样会出错
         if ("package".equals(child.getName())) {
           String mapperPackage = child.getStringAttribute("name");
           configuration.addMappers(mapperPackage);

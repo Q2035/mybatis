@@ -18,11 +18,14 @@ import java.util.Properties;
 public class Example04 {
     @Before
     public void before() throws IOException {
+//        创建数据源工厂类
         DataSourceFactory dsf = new UnpooledDataSourceFactory();
         Properties properties = new Properties();
         InputStream configStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("database.properties");
         properties.load(configStream);
+//        设置各种配置
         dsf.setProperties(properties);
+//        获取数据源对象
         DataSource dataSource = dsf.getDataSource();
         try {
             Properties jndiProps = new Properties();
