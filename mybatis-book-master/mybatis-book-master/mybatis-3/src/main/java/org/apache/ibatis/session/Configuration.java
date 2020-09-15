@@ -75,27 +75,41 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
 import java.util.*;
 
 /**
+ * MyBatis中所有环境配置、ResultMap集合、SQL语句集合、插件列表、缓存、加载的XML列表、类型别名、
+ * 类型处理器等全部都维护在Configuration中。Configuration中包含了一个内部静态类StrictMap
  * @author Clinton Begin
  */
 public class Configuration {
 
   protected Environment environment;
 
+//  允许在嵌套语句中使用分页（RowRounds）。如果允许使用则设置为false
   protected boolean safeRowBoundsEnabled;
+//  允许在嵌套语句中使用分页（ResultHandler）。如果允许使用则设置为false
   protected boolean safeResultHandlerEnabled = true;
+//  是否开启自动驼峰命名规则
   protected boolean mapUnderscoreToCamelCase;
+//  开启时，任何方法的调用都会加载该对象的所有属性。否则，每个属性会按需加载，默认值false
   protected boolean aggressiveLazyLoading;
+//  是否允许单一语句返回多结果集
   protected boolean multipleResultSetsEnabled = true;
+//  允许JDB支持自动生成主键，需要驱动兼容
   protected boolean useGeneratedKeys;
+//  使用列标签代替列名，一般来说，这是希望的结果
   protected boolean useColumnLabel = true;
+//  是否启用缓存
   protected boolean cacheEnabled = true;
+//  指定当结果集中值为null的时候是否调用映射对象的setter方法
   protected boolean callSettersOnNulls;
   protected boolean useActualParamName = true;
+//  当返回行的所有列都是空时，MyBatis默认返回null
   protected boolean returnInstanceForEmptyRow;
 
   protected String logPrefix;
   protected Class<? extends Log> logImpl;
+//  指定VFS实现，VFS是MyBatis提供的用于访问AS（Application Server）内资源的一个简便接口
   protected Class<? extends VFS> vfsImpl;
+//  利用本地缓存机制防止循环引用和加速重复嵌套查询
   protected LocalCacheScope localCacheScope = LocalCacheScope.SESSION;
   protected JdbcType jdbcTypeForNull = JdbcType.OTHER;
   protected Set<String> lazyLoadTriggerMethods = new HashSet<String>(Arrays.asList(new String[]{"equals", "clone", "hashCode", "toString"}));
@@ -124,6 +138,7 @@ public class Configuration {
   protected Class<?> configurationFactory;
 
   protected final MapperRegistry mapperRegistry = new MapperRegistry(this);
+//  MyBatis插件列表
   protected final InterceptorChain interceptorChain = new InterceptorChain();
   protected final TypeHandlerRegistry typeHandlerRegistry = new TypeHandlerRegistry();
   protected final TypeAliasRegistry typeAliasRegistry = new TypeAliasRegistry();
@@ -836,6 +851,12 @@ public class Configuration {
     }
   }
 
+  /**
+   * 它继承于HashMap，对HashMap的装饰在于增加了put时防重复的处理，
+   * get时取不到值时候的异常处理，这样核心应用层就不需要额外关心各种对象异常处理,简化应用层逻辑
+   *
+   * @param <V>
+   */
   protected static class StrictMap<V> extends HashMap<String, V> {
 
     private static final long serialVersionUID = -4950446264854982944L;

@@ -48,6 +48,7 @@ public class SqlSessionFactoryBuilder {
     try {
 //      由XMLConfigBuilder解析配置文件的关键逻辑
       XMLConfigBuilder parser = new XMLConfigBuilder(reader, environment, properties);
+//      调用parser的parse方法创建Configuration
       return build(parser.parse());
     } catch (Exception e) {
       throw ExceptionFactory.wrapException("Error building SqlSession.", e);

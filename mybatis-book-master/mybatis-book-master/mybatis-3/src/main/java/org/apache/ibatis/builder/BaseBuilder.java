@@ -36,6 +36,10 @@ public abstract class BaseBuilder {
   protected final TypeAliasRegistry typeAliasRegistry;
   protected final TypeHandlerRegistry typeHandlerRegistry;
 
+  /**
+   * 主要设置类型别名注册器，类型处理器注册
+   * @param configuration
+   */
   public BaseBuilder(Configuration configuration) {
     this.configuration = configuration;
     this.typeAliasRegistry = this.configuration.getTypeAliasRegistry();

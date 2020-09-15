@@ -242,6 +242,7 @@ public class XPathParser {
       factory.setExpandEntityReferences(true);
 
       DocumentBuilder builder = factory.newDocumentBuilder();
+//      设置MyBatis XML文档节点解析器，也就是XSMLMapperEntityResolver
       builder.setEntityResolver(entityResolver);
       builder.setErrorHandler(new ErrorHandler() {
         @Override
